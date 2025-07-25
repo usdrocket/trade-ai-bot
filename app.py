@@ -7,14 +7,6 @@ app = Flask(__name__)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-def escape_md(text):
-    if not text:
-        return ""
-    escape_chars = '_*[]()~`>#+-=|{}.!'
-    for ch in escape_chars:
-        text = text.replace(ch, '\\' + ch)
-    return text
-
 @app.route('/', methods=['POST'])
 def webhook():
     if not BOT_TOKEN or not CHAT_ID:
@@ -26,35 +18,27 @@ def webhook():
 
     # Ambil semua data yang mungkin dihantar
     signal_type = data.get("type", "Buy").capitalize()
-    pair = escape_md(data.get("pair", "Unknown"))
-    close = escape_md(data.get("close"))
-    sl = escape_md(data.get("sl"))
-    tp1 = escape_md(data.get("tp1"))
-    tp2 = escape_md(data.get("tp2"))
-    tp3 = escape_md(data.get("tp3"))
-    risk = escape_md(data.get("risk", "N/A"))
-    entry_type = escape_md(data.get("entry_type", "N/A"))
+    pair = data.get("pair", "Unknown")
+    close = data.get("close")
+    sl = data.get("sl")
+    tp1 = data.get("tp1")
+    tp2 = data.get("tp2")
+    tp3 = data.get("tp3")
+    risk = data.get("risk", "N/A")
+    entry_type = data.get("entry_type", "N/A")
 
     if not all([close, sl, tp1]):
         return "Missing required data", 400
 
-    # Emoji ikut jenis signal
-    if signal_type == "Buy":
-        emoji = "🟢"
-    elif signal_type == "Sell":
-        emoji = "🔴"
-    else:
-        emoji = "📉"
-
-    # Format mesej dengan emoji
-    msg = f"{emoji} *{signal_type} Signal Triggered!*\n"
+    # Format mesej dengan TP optional
+    msg = f"📉 *{signal_type} Signal Triggered!*\n"
     msg += f"Pair: {pair}\n"
     msg += f"Entry: {close}\n"
-    msg += f"SL: 🛑 {sl}\n"
-    msg += f"TP1: 🎯 {tp1}\n"
-    if tp2: msg += f"TP2: 🎯 {tp2}\n"
-    if tp3: msg += f"TP3: 🎯 {tp3}\n"
-    msg += f"Risk: ⚠️ {risk}\n"
+    msg += f"SL: {sl}\n"
+    msg += f"TP1: {tp1}\n"
+    if tp2: msg += f"TP2: {tp2}\n"
+    if tp3: msg += f"TP3: {tp3}\n"
+    msg += f"Risk: {risk}\n"
     msg += f"Entry Type: {entry_type}"
 
     # Hantar mesej ke Telegram
