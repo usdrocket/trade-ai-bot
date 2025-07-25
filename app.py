@@ -16,23 +16,27 @@ def webhook():
     if not data:
         return "Invalid JSON", 400
 
-    signal_type = data.get("type", "Buy").capitalize()  # Default = Buy
-    close = data.get("close")
-    sl = data.get("sl")
-    tp1 = data.get("tp1")
-    pair = data.get("pair", "Unknown Pair")
-    risk = data.get("risk", "Not Set")
-    entry_type = data.get("entry_type", "N/A")
+    # Dapatkan semua nilai dengan default kosong jika tiada
+    signal_type = data.get("type", "").upper()
+    pair = data.get("pair", "Unknown")
+    close = data.get("close", "-")
+    sl = data.get("sl", "-")
+    tp1 = data.get("tp1", "-")
+    tp2 = data.get("tp2", "-")
+    tp3 = data.get("tp3", "-")
+    risk = data.get("risk", "-")
+    entry_type = data.get("entry_type", "-")
 
-    if not all([close, sl, tp1]):
-        return "Missing required data", 400
-
-    emoji = "📈" if signal_type == "Buy" else "📉"
+    # Format mesej
     msg = (
-        f"{emoji} *{signal_type} Signal Triggered!*\n"
-        f"Pair: {pair}\n"
-        f"Entry: {close}\nSL: {sl}\nTP1: {tp1}\n"
-        f"Type: {entry_type}\nRisk: {risk}"
+        f"📡 *{signal_type} SIGNAL*\n"
+        f"📊 Pair: {pair}\n"
+        f"🎯 Entry: {close} ({entry_type})\n"
+        f"🛑 SL: {sl}\n"
+        f"✅ TP1: {tp1}\n"
+        f"✅ TP2: {tp2}\n"
+        f"✅ TP3: {tp3}\n"
+        f"⚠️ Risk Level: {risk}"
     )
 
     try:
@@ -51,4 +55,4 @@ def index():
     return "Bot is running", 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)
